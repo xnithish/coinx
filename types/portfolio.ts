@@ -30,19 +30,72 @@ export interface HoldingsFormData {
   averageBuyPrice: number
 }
 
-export interface HoldingsTableProps {
-  holdings: Holding[]
-  onAdd: () => void
-  onEdit: (holding: Holding) => void
-  onDelete: (id: string) => void
-  loading?: boolean
+export interface HoldingWithAllocation extends Holding {
+  allocationPercentage?: number
 }
 
-export interface HoldingsFormProps {
-  holding?: Holding
-  onSubmit: (data: HoldingsFormData) => void
-  onCancel: () => void
-  loading?: boolean
+export interface HoldingsTableProps {
+  portfolioItems: PortfolioItem[]
+  onRemoveCoin: (id: string) => void
+  onAddCoin: () => void
+  formatCurrency: (value: number) => string
+}
+
+export interface Coin {
+  id: string
+  symbol: string
+  name: string
+  image: string
+  current_price: number
+  price_change_percentage_24h: number
+  market_cap: number
+  total_volume: number
+}
+
+export interface PortfolioHolding {
+  id: string
+  coinId: string
+  amount: number
+  purchasePrice: number
+}
+
+export interface PortfolioItem extends PortfolioHolding {
+  coin: Coin
+  currentValue: number
+  profitLoss: number
+  profitLossPercentage: number
+}
+
+export interface PieChartData {
+  name: string
+  value: number
+  percentage: number
+  fullName: string
+  [key: string]: any // Allow additional properties for recharts compatibility
+}
+
+export interface AddCoinDialogProps {
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
+  coins: Coin[]
+  onAddCoin: (coin: Coin, amount: number, purchasePrice: number) => void
+}
+
+export interface PortfolioOverviewCardsProps {
+  portfolioItems: PortfolioItem[]
+  totalPortfolioValue: number
+  totalProfitLoss: number
+  total24hChange: number
+  total24hChangePercentage: number
+}
+
+export interface PortfolioDistributionChartProps {
+  pieChartData: PieChartData[]
+  totalPortfolioValue: number
+}
+
+export interface MarketOverviewProps {
+  coins: Coin[]
 }
 
 export interface PortfolioOverview {
@@ -60,25 +113,6 @@ export interface PortfolioMetrics {
   totalProfitLossPercentage: number
   assetCount: number
   portfolioAge: string
-  bestPerformer: string
-  bestPerformerChange: number
-  worstPerformer: string
-  worstPerformerChange: number
   dailyChange: number
   dailyChangePercentage: number
-}
-
-export interface TimeFilter {
-  label: string
-  value: string
-  active?: boolean
-}
-
-export interface PortfolioOverviewCardProps {
-  title?: string
-  timeFilters?: TimeFilter[]
-  onTimeFilterChange?: (filter: TimeFilter) => void
-  portfolioOverview: PortfolioOverview
-  metrics: PortfolioMetrics
-  loading?: boolean
 }

@@ -14,7 +14,7 @@ const DEFAULT_FILTERS: FilterOptions = {
   sortBy: "market_cap",
   sortOrder: "desc",
   page: 1,
-  perPage: 10
+  perPage: 20
 }
 
 export default function Markets() {

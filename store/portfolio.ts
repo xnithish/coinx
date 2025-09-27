@@ -27,7 +27,6 @@ interface PortfolioStore {
   deleteHolding: (id: string) => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
-  refreshPrices: () => Promise<void>
 }
 
 export const usePortfolioStore = create<PortfolioStore>((set, get) => ({
@@ -52,10 +51,6 @@ export const usePortfolioStore = create<PortfolioStore>((set, get) => ({
     totalProfitLossPercentage: 0,
     assetCount: 0,
     portfolioAge: "",
-    bestPerformer: "",
-    bestPerformerChange: 0,
-    worstPerformer: "",
-    worstPerformerChange: 0,
     dailyChange: 0,
     dailyChangePercentage: 0
   },
@@ -124,24 +119,7 @@ export const usePortfolioStore = create<PortfolioStore>((set, get) => ({
     set({ error })
   },
 
-  refreshPrices: async () => {
-    set({ isLoading: true, error: null })
-    try {
-      const { holdings } = get()
-
-      // In a real implementation, you would fetch current prices from CoinGecko here
-      // For now, we'll just recalculate with existing mock data
-      get().updateComputedValues()
-
-      // Clear any existing error
-      set({ error: null })
-    } catch (error) {
-      set({ error: 'Failed to refresh prices' })
-    } finally {
-      set({ isLoading: false })
-    }
-  },
-
+  
   // Helper method to update computed values
   updateComputedValues: () => {
     const { holdings } = get()

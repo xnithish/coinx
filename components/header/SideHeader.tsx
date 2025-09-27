@@ -42,11 +42,6 @@ const navigationItems = [
     icon: Home,
   },
   {
-    title: "Portfolio",
-    url: "/portfolio",
-    icon: PieChart,
-  },
-  {
     title: "Markets",
     url: "/markets",
     icon: TrendingUp,

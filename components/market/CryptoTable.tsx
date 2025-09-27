@@ -26,16 +26,7 @@ export function CryptoTable({ cryptocurrencies, loading = false }: CryptoTablePr
   const formatPercentage = MarketService.formatPercentage
   const getChangeColor = MarketService.getChangeColor
 
-  const renderSkeletonRow = () => (
-    <tr className="border-b">
-      {COLUMNS.map((column, index) => (
-        <td key={index} className={`py-3 ${column.width}`}>
-          <Skeleton className="h-4 w-full" />
-        </td>
-      ))}
-    </tr>
-  )
-
+  
   const renderRow = (crypto: Cryptocurrency) => {
     const priceChangeColor = getChangeColor(crypto.price_change_percentage_24h)
 
@@ -83,7 +74,7 @@ export function CryptoTable({ cryptocurrencies, loading = false }: CryptoTablePr
           {formatMarketCap(crypto.total_volume)}
         </td>
         <td className="py-3 text-muted-foreground">
-          {formatMarketCap(crypto.circulating_supply)} {crypto.symbol.toUpperCase()}
+          {MarketService.formatNumber(crypto.circulating_supply)} {crypto.symbol.toUpperCase()}
         </td>
       </tr>
     )
@@ -106,7 +97,15 @@ export function CryptoTable({ cryptocurrencies, loading = false }: CryptoTablePr
         </thead>
         <tbody>
           {loading ? (
-            Array.from({ length: 10 }).map((_, index) => renderSkeletonRow())
+            Array.from({ length: 20 }).map((_, index) => (
+              <tr key={`skeleton-${index}`} className="border-b">
+                {COLUMNS.map((column, colIndex) => (
+                  <td key={colIndex} className={`py-3 ${column.width}`}>
+                    <Skeleton className="h-4 w-full" />
+                  </td>
+                ))}
+              </tr>
+            ))
           ) : (
             cryptocurrencies.map(renderRow)
           )}

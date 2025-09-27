@@ -264,25 +264,10 @@ export const calculatePortfolioStatistics = (holdings: Holding[]): PortfolioMetr
       totalProfitLossPercentage: 0,
       assetCount: 0,
       portfolioAge: "",
-      bestPerformer: "",
-      bestPerformerChange: 0,
-      worstPerformer: "",
-      worstPerformerChange: 0,
       dailyChange: 0,
       dailyChangePercentage: 0
     }
   }
-
-  const assets = portfolioOverview.assets
-
-  // Find best and worst performers
-  const bestPerformer = assets.reduce((best, current) =>
-    current.profitLossPercentage > best.profitLossPercentage ? current : best
-  )
-
-  const worstPerformer = assets.reduce((worst, current) =>
-    current.profitLossPercentage < worst.profitLossPercentage ? current : worst
-  )
 
   // Calculate mock daily change (in real app, this would come from API)
   const dailyChangePercentage = Math.random() * 10 - 5 // -5% to +5%
@@ -297,10 +282,6 @@ export const calculatePortfolioStatistics = (holdings: Holding[]): PortfolioMetr
     totalProfitLossPercentage: portfolioOverview.totalProfitLossPercentage,
     assetCount: holdings.length,
     portfolioAge,
-    bestPerformer: bestPerformer.symbol,
-    bestPerformerChange: bestPerformer.profitLossPercentage,
-    worstPerformer: worstPerformer.symbol,
-    worstPerformerChange: worstPerformer.profitLossPercentage,
     dailyChange,
     dailyChangePercentage
   }
