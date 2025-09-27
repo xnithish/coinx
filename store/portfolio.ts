@@ -27,6 +27,7 @@ interface PortfolioStore {
   deleteHolding: (id: string) => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
+  updateComputedValues: () => void
 }
 
 export const usePortfolioStore = create<PortfolioStore>((set, get) => ({

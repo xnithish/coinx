@@ -71,7 +71,7 @@ export interface PieChartData {
   value: number
   percentage: number
   fullName: string
-  [key: string]: any // Allow additional properties for recharts compatibility
+  [key: string]: unknown // Allow additional properties for recharts compatibility
 }
 
 export interface AddCoinDialogProps {

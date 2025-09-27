@@ -435,8 +435,8 @@ export default function Calculator() {
                   </SelectTrigger>
                   <SelectContent className="max-h-72">
                     {coins.map((coin) => (
-                      <div className="justify-between">
-                        <SelectItem key={coin.id} value={coin.id}>
+                      <div key={coin.id} className="justify-between">
+                        <SelectItem value={coin.id}>
                           <span className="flex w-full items-center">
                             <span className="flex min-w-0 items-center gap-3">
                               <Image

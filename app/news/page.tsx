@@ -32,7 +32,7 @@ export default function NewsPage() {
       const filter: NewsFilter = {}
 
       if (selectedFilter !== "all") {
-        filter.filter = selectedFilter as any
+        filter.filter = selectedFilter as 'rising' | 'hot' | 'bullish' | 'bearish' | 'important' | 'saved' | 'lol'
       }
 
       if (selectedKind !== "all") {
@@ -254,7 +254,7 @@ export default function NewsPage() {
             <Search className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium">No results found</h3>
             <p className="text-sm text-muted-foreground text-center">
-              No news articles match your search query "{searchQuery}"
+              No news articles match your search query &quot;{searchQuery}&quot;
             </p>
           </CardContent>
         </Card>

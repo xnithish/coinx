@@ -106,7 +106,7 @@ export class NewsService {
   ): Promise<NewsResponse> {
     return this.fetchNews({
       ...options,
-      filter: { ...options.filter, filter: "hot" }
+      filter: { filter: "hot" }
     })
   }
 

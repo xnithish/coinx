@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Moon, Sun, Monitor } from "lucide-react"
 import type { Theme } from "@/contexts/theme-context"
 
-const themes: { key: Theme; label: string; icon: React.ComponentType<any> }[] = [
+const themes: { key: Theme; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }[] = [
   { key: "light", label: "Light", icon: Sun },
   { key: "dark", label: "Dark", icon: Moon },
   { key: "system", label: "System", icon: Monitor },

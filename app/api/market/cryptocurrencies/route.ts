@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import type { Cryptocurrency } from "@/types/crypto"
 
 export async function GET(request: NextRequest) {
   try {
@@ -71,14 +72,14 @@ export async function GET(request: NextRequest) {
     let filteredData = data
     if (search) {
       const searchTerm = search.toLowerCase()
-      filteredData = data.filter((crypto: any) =>
+      filteredData = data.filter((crypto: Cryptocurrency) =>
         crypto.name.toLowerCase().includes(searchTerm) ||
         crypto.symbol.toLowerCase().includes(searchTerm)
       )
     }
 
     // Transform the response to our format
-    const cryptocurrencies = filteredData.map((crypto: any) => ({
+    const cryptocurrencies = filteredData.map((crypto: Cryptocurrency) => ({
       id: crypto.id,
       symbol: crypto.symbol,
       name: crypto.name,
