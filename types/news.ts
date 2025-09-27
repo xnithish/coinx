@@ -67,8 +67,8 @@ export interface NewsResponse {
 }
 
 export type NewsFilter = {
-  filter?: 'rising' | 'hot' | 'bullish' | 'bearish' | 'important' | 'saved' | 'lol'
-  kind?: 'news' | 'media'
+  filter?: 'all' | 'rising' | 'hot' | 'bullish' | 'bearish' | 'important' | 'saved' | 'lol'
+  kind?: 'all' | 'news' | 'media'
   currencies?: string
   regions?: string
 }
