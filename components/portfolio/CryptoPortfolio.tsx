@@ -165,7 +165,6 @@ export function CryptoPortfolio() {
           totalPortfolioValue={totalPortfolioValue}
           totalProfitLoss={totalProfitLoss}
           total24hChange={total24hChange}
-          total24hChangePercentage={total24hChangePercentage}
         />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
