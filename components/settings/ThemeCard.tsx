@@ -2,8 +2,9 @@ import { useTheme } from "@/contexts/theme-context"
 import { SettingsCard } from "./SettingsCard"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun, Monitor } from "lucide-react"
+import type { Theme } from "@/contexts/theme-context"
 
-const themes = [
+const themes: { key: Theme; label: string; icon: React.ComponentType<any> }[] = [
   { key: "light", label: "Light", icon: Sun },
   { key: "dark", label: "Dark", icon: Moon },
   { key: "system", label: "System", icon: Monitor },
