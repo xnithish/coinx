@@ -18,7 +18,11 @@
       "mcp__coingecko_mcp_local__get_coins_markets",
       "mcp__coingecko_mcp_local__get_coins_top_gainers_losers",
       "mcp__coingecko_mcp_local__get_global",
-      "mcp__coingecko_mcp_local__get_simple_price"
+      "mcp__coingecko_mcp_local__get_simple_price",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm list:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []
