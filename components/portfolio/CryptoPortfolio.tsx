@@ -170,7 +170,6 @@ export function CryptoPortfolio() {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
           <PortfolioDistributionChart
             pieChartData={pieChartData}
-            totalPortfolioValue={totalPortfolioValue}
           />
           <MarketOverview coins={coins} />
         </div>
