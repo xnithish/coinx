@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const sortBy = searchParams.get("sort_by") || "market_cap"
     const sortOrder = searchParams.get("sort_order") || "desc"
     const search = searchParams.get("search") || ""
+    const currency = searchParams.get("currency") || "usd"
 
     // Validate parameters
     if (perPage > 250) {
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     // Build CoinGecko API URL
     const coinGeckoUrl = new URL("https://api.coingecko.com/api/v3/coins/markets")
-    coinGeckoUrl.searchParams.set("vs_currency", "usd")
+    coinGeckoUrl.searchParams.set("vs_currency", currency)
     coinGeckoUrl.searchParams.set("order", `${sortBy}_${sortOrder}`)
     coinGeckoUrl.searchParams.set("per_page", perPage.toString())
     coinGeckoUrl.searchParams.set("page", page.toString())

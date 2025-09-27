@@ -3,7 +3,8 @@
 import { MarketStats } from "@/types/crypto"
 import { MarketService } from "@/lib/market-service"
 import { Skeleton } from "@/components/ui/skeleton"
-import { TrendingUp, TrendingDown, Bitcoin, Activity, DollarSign, BarChart3 } from "lucide-react"
+import { Bitcoin, Activity, DollarSign, BarChart3 } from "lucide-react"
+import { useCurrency } from "@/contexts/currency-context"
 
 interface MarketStatsBarProps {
   stats: MarketStats
@@ -11,10 +12,9 @@ interface MarketStatsBarProps {
 }
 
 export function MarketStatsBar({ stats, loading = false }: MarketStatsBarProps) {
-  const formatMarketCap = MarketService.formatMarketCap
-  const formatPercentage = MarketService.formatPercentage
-  const getChangeColor = MarketService.getChangeColor
-
+  const { currency } = useCurrency()
+  const formatMarketCap = (value: number) => MarketService.formatMarketCap(value, currency)
+  
   const statsData = [
     {
       label: "Cryptocurrencies",

@@ -1,20 +1,29 @@
 import { TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Activity } from 'lucide-react'
 import { PortfolioOverviewCardsProps } from '@/types/portfolio'
+import { useCurrency } from '@/contexts/currency-context'
+import { MarketService } from '@/lib/market-service'
 
 export function PortfolioOverviewCards({
   portfolioItems,
   totalPortfolioValue,
   totalProfitLoss,
-  total24hChange,
-  total24hChangePercentage
+  total24hChange
 }: PortfolioOverviewCardsProps) {
+  const { currency } = useCurrency()
+
   const formatCurrency = (value: number) => {
+    const symbol = MarketService.getCurrencySymbol(currency)
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: currency,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
-    }).format(value)
+    }).format(value).replace(currency, symbol)
+  }
+
+  const formatCurrencyWithSign = (value: number) => {
+    const sign = value >= 0 ? '+' : ''
+    return sign + formatCurrency(value)
   }
 
   const statsData = [
@@ -26,7 +35,7 @@ export function PortfolioOverviewCards({
     },
     {
       label: 'Total Profit/Loss',
-      value: formatCurrency(totalProfitLoss),
+      value: formatCurrencyWithSign(totalProfitLoss),
       icon: totalProfitLoss >= 0 ? TrendingUp : TrendingDown,
       color: totalProfitLoss >= 0 ? 'text-[#00DC33]' : 'text-red-600'
     },
@@ -38,7 +47,7 @@ export function PortfolioOverviewCards({
     },
     {
       label: '24h Change',
-      value: formatCurrency(total24hChange),
+      value: formatCurrencyWithSign(total24hChange),
       icon: Activity,
       color: total24hChange >= 0 ? 'text-[#00DC33]' : 'text-red-600'
     }

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const currency = searchParams.get("currency") || "usd"
+
     // Fetch global market data from CoinGecko
     const response = await fetch(
       "https://api.coingecko.com/api/v3/global",
@@ -20,9 +23,10 @@ export async function GET(request: NextRequest) {
         console.log("Limit reached - CoinGecko API rate limit exceeded for global market data")
         // Return fallback data instead of throwing error
         return NextResponse.json({
-          total_market_cap_usd: 0,
-          total_volume_24h_usd: 0,
-          active_cryptocurrencies: 0
+          total_market_cap: 0,
+          total_volume_24h: 0,
+          active_cryptocurrencies: 0,
+          btc_dominance: 0
         })
       }
       throw new Error(`CoinGecko API error: ${response.status}`)
@@ -34,17 +38,19 @@ export async function GET(request: NextRequest) {
     if (data.error && data.error.includes("rate limit")) {
       console.log("Limit reached - CoinGecko API rate limit exceeded for global market data")
       return NextResponse.json({
-        total_market_cap_usd: 0,
-        total_volume_24h_usd: 0,
-        active_cryptocurrencies: 0
+        total_market_cap: 0,
+        total_volume_24h: 0,
+        active_cryptocurrencies: 0,
+        btc_dominance: 0
       })
     }
 
     // Transform the response to our format
     const globalData = {
-      total_market_cap_usd: data.data.total_market_cap.usd || 0,
-      total_volume_24h_usd: data.data.total_volume.usd || 0,
-      active_cryptocurrencies: data.data.active_cryptocurrencies || 0
+      total_market_cap: data.data.total_market_cap[currency] || data.data.total_market_cap.usd || 0,
+      total_volume_24h: data.data.total_volume[currency] || data.data.total_volume.usd || 0,
+      active_cryptocurrencies: data.data.active_cryptocurrencies || 0,
+      btc_dominance: data.data.market_cap_percentage.btc || 0
     }
 
     return NextResponse.json(globalData)
@@ -53,9 +59,10 @@ export async function GET(request: NextRequest) {
 
     // Return fallback data
     return NextResponse.json({
-      total_market_cap_usd: 0,
-      total_volume_24h_usd: 0,
-      active_cryptocurrencies: 0
+      total_market_cap: 0,
+      total_volume_24h: 0,
+      active_cryptocurrencies: 0,
+      btc_dominance: 0
     })
   }
 }

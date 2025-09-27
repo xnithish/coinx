@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -35,9 +34,18 @@ import {
   Bell,
   Sun,
   Moon,
-  DollarSign,
   LogOut,
 } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { useCurrency } from "@/contexts/currency-context"
 
 const pageTitles: { [key: string]: string } = {
   "/": "Dashboard",
@@ -50,8 +58,9 @@ const pageTitles: { [key: string]: string } = {
 
 export function LayoutHeader() {
   const pathname = usePathname()
-  const [currency, setCurrency] = React.useState("USD")
+  const { currency, setCurrency } = useCurrency()
   const [isDarkMode, setIsDarkMode] = React.useState(false)
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false)
 
   const pageTitle = pageTitles[pathname] || "Dashboard"
 
@@ -79,7 +88,7 @@ export function LayoutHeader() {
   }
 
   return (
-    <header className="flex items-center justify-between w-full">
+    <header className="flex items-center justify-between">
       <div className="flex items-center gap-4">
         <SidebarTrigger />
         <h1 className="text-sm font-medium">{pageTitle}</h1>
@@ -141,7 +150,7 @@ export function LayoutHeader() {
         </Popover>
 
         {/* Dark Mode Switch */}
-        <div className="flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2">
           <Sun className="h-4 w-4" />
           <Switch
             checked={isDarkMode}
@@ -151,22 +160,37 @@ export function LayoutHeader() {
         </div>
 
         {/* User Avatar */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="https://avatar.iran.liara.run/public/44" alt="User" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-20" align="end" forceMount>
-            <DropdownMenuItem className="cursor-pointer">
-              <LogOut className="h-4" />
-              <span>Sign out</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="/user.png" alt="User" />
+                  <AvatarFallback>JD</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-20" align="end" forceMount>
+              <DialogTrigger asChild>
+                <DropdownMenuItem className="cursor-pointer">
+                  <LogOut className="h-4" />
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </DialogTrigger>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Sign Out</DialogTitle>
+              <DialogDescription>
+                Hey, I won&apos;t let you log out :)
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button onClick={() => setIsDialogOpen(false)}>OK</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </header>
   )

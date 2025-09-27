@@ -86,12 +86,10 @@ export interface PortfolioOverviewCardsProps {
   totalPortfolioValue: number
   totalProfitLoss: number
   total24hChange: number
-  total24hChangePercentage: number
 }
 
 export interface PortfolioDistributionChartProps {
   pieChartData: PieChartData[]
-  totalPortfolioValue: number
 }
 
 export interface MarketOverviewProps {

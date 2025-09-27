@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Geist,  } from "next/font/google";
+import { Geist } from "next/font/google";
 import { AppSidebar } from "@/components/header/SideHeader";
+import { ThemeProvider } from "@/contexts/theme-context";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,7 +25,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} antialiased`}
       >
-        <AppSidebar>{children}</AppSidebar>
+        <ThemeProvider>
+          <AppSidebar>{children}</AppSidebar>
+        </ThemeProvider>
       </body>
     </html>
   );

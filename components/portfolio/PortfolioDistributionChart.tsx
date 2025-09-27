@@ -19,41 +19,45 @@ export function PortfolioDistributionChart({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Portfolio Distribution</CardTitle>
-        <CardDescription>Your portfolio allocation by cryptocurrency</CardDescription>
+        <CardTitle className="text-lg sm:text-xl">Portfolio Distribution</CardTitle>
+        <CardDescription className="text-sm">Your portfolio allocation by cryptocurrency</CardDescription>
       </CardHeader>
       <CardContent>
         {pieChartData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={pieChartData}
-                cx="50%"
-                cy="50%"
-                labelLine={true}
-                label={({ name, percentage }) => `${name} ${(percentage as number).toFixed(1)}%`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {pieChartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip
-                formatter={(value: number, name: string) => [
-                  formatCurrency(value),
-                  name
-                ]}
-              />
-              <Legend
-                verticalAlign="bottom"
-                height={36}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="h-[250px] sm:h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={pieChartData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percentage }) => `${name} ${(percentage as number).toFixed(1)}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {pieChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value: number, name: string) => [
+                    formatCurrency(value),
+                    name
+                  ]}
+                />
+                <Legend
+                  verticalAlign="bottom"
+                  height={36}
+                  layout="vertical"
+                  align="center"
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         ) : (
-          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[250px] sm:h-[300px] text-muted-foreground text-sm sm:text-base">
             No assets in portfolio
           </div>
         )}

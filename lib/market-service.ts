@@ -5,6 +5,7 @@ import {
   CryptoListResponse,
   FilterOptions
 } from "@/types/crypto"
+import { Currency } from "@/contexts/currency-context"
 
 export class MarketService {
   static formatNumber(num: number): string {
@@ -23,9 +24,9 @@ export class MarketService {
   private static readonly DEFAULT_PER_PAGE = 50
   private static readonly MAX_PER_PAGE = 250
 
-  static async getGlobalMarketData(): Promise<GlobalMarketData> {
+  static async getGlobalMarketData(currency: Currency = "USD"): Promise<GlobalMarketData> {
     try {
-      const response = await fetch("/api/market/global", {
+      const response = await fetch(`/api/market/global?currency=${currency.toLowerCase()}`, {
         method: "GET",
         headers: {
           "Accept": "application/json",
@@ -45,7 +46,8 @@ export class MarketService {
   }
 
   static async getCryptocurrencies(
-    options: Partial<FilterOptions> = {}
+    options: Partial<FilterOptions> = {},
+    currency: Currency = "USD"
   ): Promise<CryptoListResponse> {
     const {
       page = 1,
@@ -61,6 +63,7 @@ export class MarketService {
         per_page: Math.min(perPage, this.MAX_PER_PAGE).toString(),
         sort_by: sortBy,
         sort_order: sortOrder,
+        currency,
       })
 
       if (search) {
@@ -86,12 +89,12 @@ export class MarketService {
     }
   }
 
-  static async searchCryptocurrencies(query: string): Promise<Cryptocurrency[]> {
+  static async searchCryptocurrencies(query: string, currency: Currency = "USD"): Promise<Cryptocurrency[]> {
     try {
       const response = await this.getCryptocurrencies({
         search: query,
         perPage: 20,
-      })
+      }, currency)
 
       return response.cryptocurrencies
     } catch (error) {
@@ -100,13 +103,13 @@ export class MarketService {
     }
   }
 
-  static async getTopCryptocurrencies(limit: number = 10): Promise<Cryptocurrency[]> {
+  static async getTopCryptocurrencies(limit: number = 10, currency: Currency = "USD"): Promise<Cryptocurrency[]> {
     try {
       const response = await this.getCryptocurrencies({
         perPage: limit,
         sortBy: "market_cap",
         sortOrder: "desc",
-      })
+      }, currency)
 
       return response.cryptocurrencies
     } catch (error) {
@@ -115,29 +118,45 @@ export class MarketService {
     }
   }
 
-  static formatPrice(price: number): string {
-    if (price >= 1_000_000_000) {
-      return `$${(price / 1_000_000_000).toFixed(2)}B`
-    } else if (price >= 1_000_000) {
-      return `$${(price / 1_000_000).toFixed(2)}M`
-    } else if (price >= 1_000) {
-      return `$${(price / 1_000).toFixed(2)}K`
-    } else if (price >= 1) {
-      return `$${price.toFixed(2)}`
-    } else {
-      return `$${price.toFixed(6)}`
+  static getCurrencySymbol(currency: Currency): string {
+    switch (currency) {
+      case "EUR":
+        return "€"
+      case "INR":
+        return "₹"
+      case "USD":
+      default:
+        return "$"
     }
   }
 
-  static formatMarketCap(marketCap: number): string {
-    if (marketCap >= 1_000_000_000_000) {
-      return `$${(marketCap / 1_000_000_000_000).toFixed(2)}T`
-    } else if (marketCap >= 1_000_000_000) {
-      return `$${(marketCap / 1_000_000_000).toFixed(2)}B`
-    } else if (marketCap >= 1_000_000) {
-      return `$${(marketCap / 1_000_000).toFixed(2)}M`
+  static formatPrice(price: number, currency: Currency = "USD"): string {
+    const symbol = this.getCurrencySymbol(currency)
+
+    if (price >= 1_000_000_000) {
+      return `${symbol}${(price / 1_000_000_000).toFixed(2)}B`
+    } else if (price >= 1_000_000) {
+      return `${symbol}${(price / 1_000_000).toFixed(2)}M`
+    } else if (price >= 1_000) {
+      return `${symbol}${(price / 1_000).toFixed(2)}K`
+    } else if (price >= 1) {
+      return `${symbol}${price.toFixed(2)}`
     } else {
-      return `$${marketCap.toFixed(0)}`
+      return `${symbol}${price.toFixed(6)}`
+    }
+  }
+
+  static formatMarketCap(marketCap: number, currency: Currency = "USD"): string {
+    const symbol = this.getCurrencySymbol(currency)
+
+    if (marketCap >= 1_000_000_000_000) {
+      return `${symbol}${(marketCap / 1_000_000_000_000).toFixed(2)}T`
+    } else if (marketCap >= 1_000_000_000) {
+      return `${symbol}${(marketCap / 1_000_000_000).toFixed(2)}B`
+    } else if (marketCap >= 1_000_000) {
+      return `${symbol}${(marketCap / 1_000_000).toFixed(2)}M`
+    } else {
+      return `${symbol}${marketCap.toFixed(0)}`
     }
   }
 
@@ -169,12 +188,10 @@ export class MarketService {
     globalData: GlobalMarketData
   ): MarketStats {
     const btc = cryptocurrencies.find(crypto => crypto.symbol.toLowerCase() === "btc")
-    const btcDominance = btc
-      ? (btc.market_cap / globalData.total_market_cap_usd) * 100
-      : 0
+    const btcDominance = globalData.btc_dominance || 0
 
-    const totalMarketCap = globalData.total_market_cap_usd
-    const totalVolume = globalData.total_volume_24h_usd
+    const totalMarketCap = globalData.total_market_cap
+    const totalVolume = globalData.total_volume_24h
 
     return {
       totalMarketCap,

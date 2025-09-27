@@ -14,8 +14,11 @@ import {
   PortfolioItem,
   PieChartData
 } from '@/types/portfolio'
+import { useCurrency } from '@/contexts/currency-context'
+import { MarketService } from '@/lib/market-service'
 
 export function CryptoPortfolio() {
+  const { currency } = useCurrency()
   const [portfolio, setPortfolio] = useState<PortfolioHolding[]>([])
   const [coins, setCoins] = useState<Coin[]>([])
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -28,6 +31,24 @@ export function CryptoPortfolio() {
       } catch (error) {
         console.error('Error parsing saved portfolio:', error)
       }
+    } else {
+      // Add default holdings if no portfolio exists
+      const defaultHoldings: PortfolioHolding[] = [
+        {
+          id: 'default-btc',
+          coinId: 'bitcoin',
+          amount: 0.5,
+          purchasePrice: 45000
+        },
+        {
+          id: 'default-sol',
+          coinId: 'solana',
+          amount: 10,
+          purchasePrice: 120
+        }
+      ]
+      localStorage.setItem('cryptoPortfolio', JSON.stringify(defaultHoldings))
+      setPortfolio(defaultHoldings)
     }
   }, [])
 
@@ -39,7 +60,7 @@ export function CryptoPortfolio() {
   const fetchCoins = useCallback(async () => {
     try {
       const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`,
+        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency.toLowerCase()}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`,
         { cache: 'no-store' }
       )
 
@@ -52,7 +73,7 @@ export function CryptoPortfolio() {
     } catch (error) {
       console.error('Error fetching coins:', error)
     }
-  }, [])
+  }, [currency])
 
   useEffect(() => {
     fetchCoins()
@@ -110,30 +131,33 @@ export function CryptoPortfolio() {
   }))
 
   const formatCurrency = (value: number) => {
+    const symbol = MarketService.getCurrencySymbol(currency)
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: currency,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
-    }).format(value)
+    }).format(value).replace(currency, symbol)
   }
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto px-6 space-y-6">
-        <header className="flex items-center justify-between">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-6">
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className='flex flex-col space-y-1'>
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome to your cryptocurrency portfolio overview
-        </p>
-      </div>
-          <div className="flex items-center gap-4">
-            <Button onClick={() => setIsAddDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Coin
-            </Button>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-md">
+              Welcome to your cryptocurrency portfolio overview
+            </p>
           </div>
+          <Button
+            onClick={() => setIsAddDialogOpen(true)}
+            className="w-full sm:w-auto"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            <span className="hidden sm:inline">Add Coin</span>
+            <span className="sm:hidden">Add</span>
+          </Button>
         </header>
 
         <PortfolioOverviewCards
@@ -144,7 +168,7 @@ export function CryptoPortfolio() {
           total24hChangePercentage={total24hChangePercentage}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
           <PortfolioDistributionChart
             pieChartData={pieChartData}
             totalPortfolioValue={totalPortfolioValue}

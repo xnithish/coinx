@@ -41,9 +41,10 @@ export interface SimplePriceData {
 }
 
 export interface GlobalMarketData {
-  total_market_cap_usd: number
-  total_volume_24h_usd: number
+  total_market_cap: number
+  total_volume_24h: number
   active_cryptocurrencies: number
+  btc_dominance: number
 }
 
 export interface MarketStats {

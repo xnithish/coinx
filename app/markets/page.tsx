@@ -7,7 +7,8 @@ import { CryptoTable, CryptoTableSkeleton } from "@/components/market/CryptoTabl
 import { MarketStatsBar, MarketStatsBarSkeleton } from "@/components/market/MarketStatsBar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Search, RefreshCw, TrendingUp, BarChart3, ExternalLink } from "lucide-react"
+import { RefreshCw, BarChart3, ExternalLink } from "lucide-react"
+import { useCurrency } from "@/contexts/currency-context"
 
 const DEFAULT_FILTERS: FilterOptions = {
   search: "",
@@ -18,9 +19,12 @@ const DEFAULT_FILTERS: FilterOptions = {
 }
 
 export default function Markets() {
+  const { currency } = useCurrency()
   const [cryptocurrencies, setCryptocurrencies] = useState<Cryptocurrency[]>([])
   const [marketStats, setMarketStats] = useState<MarketStats | null>(null)
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(DEFAULT_FILTERS)
+  const [currentSort, setCurrentSort] = useState<string>('market_cap')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
@@ -32,11 +36,11 @@ export default function Markets() {
       }
       setError(null)
 
-      // Fetch global market data
-      const globalData = await MarketService.getGlobalMarketData()
+      // Fetch global market data with currency parameter
+      const globalData = await MarketService.getGlobalMarketData(currency)
 
-      // Fetch cryptocurrencies
-      const cryptoResponse = await MarketService.getCryptocurrencies(filterOptions)
+      // Fetch cryptocurrencies with currency parameter
+      const cryptoResponse = await MarketService.getCryptocurrencies(filterOptions, currency)
 
       // Calculate market stats
       const stats = MarketService.calculateMarketStats(
@@ -53,7 +57,7 @@ export default function Markets() {
       setLoading(false)
       setRefreshing(false)
     }
-  }, [filterOptions])
+  }, [filterOptions, currency])
 
   useEffect(() => {
     fetchData()
@@ -64,15 +68,15 @@ export default function Markets() {
     fetchData(false)
   }
 
-  const handleFilterChange = (newFilters: FilterOptions) => {
-    setFilterOptions(newFilters)
-  }
-
-  const getTrendingCryptos = () => {
-    const sorted = [...cryptocurrencies].sort(
-      (a, b) => Math.abs(b.price_change_percentage_24h) - Math.abs(a.price_change_percentage_24h)
-    )
-    return sorted.slice(0, 5)
+  const handleSort = (column: string) => {
+    if (currentSort === column) {
+      // Toggle sort order if same column
+      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')
+    } else {
+      // Set new column and default to descending
+      setCurrentSort(column)
+      setSortOrder('desc')
+    }
   }
 
   if (error) {
@@ -108,16 +112,16 @@ export default function Markets() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Markets</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Markets</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Track cryptocurrency markets and prices
           </p>
         </div>
-        <Button onClick={handleRefresh} disabled={refreshing}>
+        <Button onClick={handleRefresh} disabled={refreshing} className="w-full sm:w-auto">
           <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
           {refreshing ? "Refreshing..." : "Refresh"}
         </Button>
@@ -132,18 +136,28 @@ export default function Markets() {
 
       {/* Cryptocurrency Table */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+          <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
             All Cryptocurrencies
           </h3>
+          <div className="text-xs sm:text-sm text-muted-foreground">
+            Sort by: {currentSort.replace(/_/g, ' ')} ({sortOrder})
+          </div>
         </div>
 
-        {loading ? (
-          <CryptoTableSkeleton />
-        ) : (
-          <CryptoTable cryptocurrencies={cryptocurrencies} />
-        )}
+        <div className="rounded-lg border bg-card overflow-hidden">
+          {loading ? (
+            <CryptoTableSkeleton />
+          ) : (
+            <CryptoTable
+              cryptocurrencies={cryptocurrencies}
+              currentSort={currentSort}
+              sortOrder={sortOrder}
+              onSort={handleSort}
+            />
+          )}
+        </div>
 
         {!loading && cryptocurrencies.length === 0 && (
           <Card>
@@ -169,7 +183,7 @@ export default function Markets() {
             <Button
               variant="outline"
               onClick={() => window.open("https://www.coingecko.com/", "_blank")}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto"
             >
               <ExternalLink className="h-4 w-4" />
               View More on CoinGecko
