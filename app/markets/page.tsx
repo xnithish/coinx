@@ -3,20 +3,18 @@
 import { useState, useEffect, useCallback } from "react"
 import { Cryptocurrency, MarketStats, FilterOptions } from "@/types/crypto"
 import { MarketService } from "@/lib/market-service"
-import { CryptoCard, CryptoCardSkeleton } from "@/components/crypto-card"
-import { MarketStats, MarketStatsSkeleton } from "@/components/market-stats"
-import { SearchFilter } from "@/components/search-filter"
+import { CryptoTable, CryptoTableSkeleton } from "@/components/market/CryptoTable"
+import { MarketStatsBar, MarketStatsBarSkeleton } from "@/components/market/MarketStatsBar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { RefreshCw, TrendingUp, TrendingDown, BarChart3 } from "lucide-react"
+import { Search, RefreshCw, TrendingUp, BarChart3, ExternalLink } from "lucide-react"
 
 const DEFAULT_FILTERS: FilterOptions = {
   search: "",
   sortBy: "market_cap",
   sortOrder: "desc",
   page: 1,
-  perPage: 50
+  perPage: 10
 }
 
 export default function Markets() {
@@ -127,81 +125,24 @@ export default function Markets() {
 
       {/* Market Statistics */}
       {loading ? (
-        <MarketStatsSkeleton />
+        <MarketStatsBarSkeleton />
       ) : marketStats ? (
-        <MarketStats stats={marketStats} />
+        <MarketStatsBar stats={marketStats} />
       ) : null}
 
-      {/* Search and Filter */}
-      <SearchFilter
-        filterOptions={filterOptions}
-        onFilterChange={handleFilterChange}
-        loading={loading}
-      />
-
-      {/* Trending Section */}
-      {!loading && cryptocurrencies.length > 0 && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Trending Cryptocurrencies
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Biggest movers in the last 24 hours
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              {getTrendingCryptos().map((crypto) => (
-                <div key={crypto.id} className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <img
-                      src={crypto.image}
-                      alt={crypto.symbol}
-                      className="w-6 h-6 rounded-full"
-                    />
-                    <span className="ml-2 font-medium text-sm">{crypto.symbol}</span>
-                  </div>
-                  <div className={`text-sm font-medium ${
-                    MarketService.getChangeColor(crypto.price_change_percentage_24h)
-                  }`}>
-                    {MarketService.formatPercentage(crypto.price_change_percentage_24h)}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {MarketService.formatPrice(crypto.current_price)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Cryptocurrency Grid */}
+      {/* Cryptocurrency Table */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
             All Cryptocurrencies
           </h3>
-          <div className="text-sm text-muted-foreground">
-            Showing {cryptocurrencies.length} cryptocurrencies
-          </div>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <CryptoCardSkeleton key={index} />
-            ))}
-          </div>
+          <CryptoTableSkeleton />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {cryptocurrencies.map((crypto) => (
-              <CryptoCard key={crypto.id} crypto={crypto} />
-            ))}
-          </div>
+          <CryptoTable cryptocurrencies={cryptocurrencies} />
         )}
 
         {!loading && cryptocurrencies.length === 0 && (
@@ -220,6 +161,20 @@ export default function Markets() {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* View More Button */}
+        {!loading && cryptocurrencies.length > 0 && (
+          <div className="flex justify-center mt-6">
+            <Button
+              variant="outline"
+              onClick={() => window.open("https://www.coingecko.com/", "_blank")}
+              className="flex items-center gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              View More on CoinGecko
+            </Button>
+          </div>
         )}
       </div>
     </div>

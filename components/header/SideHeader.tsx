@@ -23,7 +23,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { LayoutHeader } from "@/components/layout-header"
+import { LayoutHeader } from "@/components/header/LayoutHeader"
 import {
   Home,
   PieChart,

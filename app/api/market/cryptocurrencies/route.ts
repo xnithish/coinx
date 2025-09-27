@@ -40,10 +40,31 @@ export async function GET(request: NextRequest) {
     })
 
     if (!response.ok) {
+      // Check if it's a rate limit error
+      if (response.status === 429) {
+        console.log("Limit reached - CoinGecko API rate limit exceeded for cryptocurrencies data")
+        return NextResponse.json({
+          cryptocurrencies: [],
+          total: 0,
+          page,
+          perPage
+        })
+      }
       throw new Error(`CoinGecko API error: ${response.status}`)
     }
 
     const data = await response.json()
+
+    // Check if the response indicates rate limiting
+    if (data.error && (data.error.includes("rate limit") || data.error.includes("Too Many Requests"))) {
+      console.log("Limit reached - CoinGecko API rate limit exceeded for cryptocurrencies data")
+      return NextResponse.json({
+        cryptocurrencies: [],
+        total: 0,
+        page,
+        perPage
+      })
+    }
 
     // Filter by search term if provided
     let filteredData = data
